@@ -135,7 +135,6 @@ async function guardarMecanico() {
     else toast(r.mensaje||'Error', true);
 }
 
-
 cargarMecanicos('');
 </script>
 
