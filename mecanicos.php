@@ -91,24 +91,27 @@ include("layout.php");
 </div>
 
 <script>
-async function cargarMecanicos(q) {
-    const d = await api({accion:'listar_mecanicos', q: q||''});
+async function cargarMecanicos() {
+    const d = await api({ accion: 'listar_mecanicos_stats' });
     const tb = document.getElementById('tbody-mecanicos');
+
     if (!d.ok || !d.datos.length) {
-        tb.innerHTML = '<tr><td colspan="8"><div class="empty-state"><div class="icon">👤</div><p>No se encontraron mecanicos</p></div></td></tr>';
+        tb.innerHTML = '<tr><td colspan="8"><div class="empty-state"><div class="icon">🔩</div><p>No hay mecánicos registrados</p></div></td></tr>';
         return;
     }
-    tb.innerHTML = d.datos.map(c => `
+
+    tb.innerHTML = d.datos.map(m => `
         <tr>
-            <td class="td-mono">${c.id_mecanico}</td>
-            <td><strong>${c.nombre} ${c.apellido_pat} ${c.apellido_mat||''}</strong></td>
-            <td class="td-mono">${c.telefono}</td>
-            <td class="td-mono">${c.telefono_alt||'—'}</td>
-            <td class="td-muted">${c.correo||'—'}</td>
-            <td class="td-muted" style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.direccion||'—'}</td>
-            <td class="td-muted">${new Date(c.fecha_registro).toLocaleDateString('es-MX')}</td>
+            <td class="td-mono">${m.id_mecanico}</td>
+            <td><strong>${m.nombre} ${m.apellido_pat} ${m.apellido_mat || ''}</strong></td>
+            <td class="td-mono">${m.telefono || '—'}</td>
+            <td class="td-muted">${m.especialidad || '—'}</td>
+            <td class="td-mono" style="color:var(--warning)">${m.ordenes_activas}</td>
+            <td class="td-mono">${m.total_ordenes}</td>
+            <td class="td-mono">$${Number(m.ingresos_generados).toLocaleString('es-MX')}</td>
+            <td class="td-mono">$${Number(m.salario).toLocaleString('es-MX')}</td>
             <td>
-                <button class="btn btn-secondary btn-sm" onclick='editarMecanico(${JSON.stringify(c)})'>✏️ Editar</button>
+                <button class="btn btn-secondary btn-sm" onclick='editarMecanico(${JSON.stringify(m)})'>✏️ Editar</button>
             </td>
         </tr>
     `).join('');
