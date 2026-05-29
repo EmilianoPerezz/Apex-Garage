@@ -117,21 +117,6 @@ async function cargarMecanicos() {
     `).join('');
 }
 
-async function cargarMecanicos() {
-    const d = await api({ accion: 'listar_mecanicos_stats' });
-    // d.datos tiene: nombre, ordenes_activas, total_ordenes, ingresos_generados, salario
-}
-
-function editarMecanico(datos) {
-    // abre el modal y rellena los campos con datos
-    document.getElementById('form-mecanico').reset();
-    Object.keys(datos).forEach(k => {
-        const el = document.getElementById('fm-' + k);
-        if (el) el.value = datos[k] ?? '';
-    });
-    abrirModal('modal-mecanico');
-}
-
 function abrirModalMecanico(datos=null) {
     document.getElementById('modal-mecanico-titulo').textContent = datos ? 'Editar Mecánico' : 'Nuevo Mecánico';
     const f = document.getElementById('form-mecanico');

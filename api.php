@@ -225,7 +225,8 @@ switch ($accion) {
         $lista = [];
         while ($f = $r->fetch_assoc()) $lista[] = $f;
         responder(true, $lista);
-
+        break;
+        
     // ── INVENTARIO ────────────────────────────────────────────
     case 'listar_inventario':
         $r = $conexion->query("SELECT *, (cantidad<=stock_minimo) AS stock_critico FROM INVENTARIO ORDER BY nombre");
