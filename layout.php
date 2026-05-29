@@ -181,6 +181,8 @@ td { padding:11px 16px; vertical-align:middle; }
         <a class="nav-item <?= $paginaActual==='inventario' ? 'active' : '' ?>" href="inventario.php">
             <span class="icon">📦</span> Inventario
             <span class="badge-nav" id="badge-stock" style="display:none">!</span>
+        <a class="nav-item <?= $paginaActual==='mecanicos' ? 'active' : '' ?>" href="mecanicos.php">
+            <span class="icon">🔩</span> Mecánicos
         </a>
     </nav>
 </aside>

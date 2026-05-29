@@ -262,6 +262,27 @@ switch ($accion) {
         $conexion->query("DELETE FROM INVENTARIO WHERE id_refaccion=$id");
         responder(true, [], 'Refacción eliminada');
 
+    // ── MECANICO ────────────────────────────────────────────
+    case 'guardar_mecanico':
+    $nombre   = esc($conexion, $_POST['nombre']       ?? '');
+    $ap_pat   = esc($conexion, $_POST['apellido_pat'] ?? '');
+    $ap_mat   = esc($conexion, $_POST['apellido_mat'] ?? '');
+    $tel      = esc($conexion, $_POST['telefono']     ?? '');
+    $espec    = esc($conexion, $_POST['especialidad'] ?? '');
+    $salario  = (float)($_POST['salario'] ?? 0);        // <-- campo nuevo en BD
+    $id = (int)($_POST['id_mecanico'] ?? 0);
+    if ($id) {
+        $conexion->query("UPDATE MECANICO SET nombre='$nombre', apellido_pat='$ap_pat',
+            apellido_mat='$ap_mat', telefono='$tel', especialidad='$espec', salario=$salario
+            WHERE id_mecanico=$id");
+        responder(true, [], 'Mecánico actualizado');
+    } else {
+        $conexion->query("INSERT INTO MECANICO (nombre,apellido_pat,apellido_mat,telefono,especialidad,salario)
+            VALUES ('$nombre','$ap_pat','$ap_mat','$tel','$espec',$salario)");
+        responder(true, ['id_mecanico'=>$conexion->insert_id], 'Mecánico guardado');
+    }
+    
+
     // ── CATÁLOGO DE SERVICIOS ─────────────────────────────────
     case 'listar_servicios':
         $r = $conexion->query("SELECT * FROM CATALOGO_SERVICIO WHERE activo=1 ORDER BY nombre");
