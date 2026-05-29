@@ -151,8 +151,8 @@ function renderOrdenes(lista) {
             <td class="td-mono">${o.total > 0 ? '$'+Number(o.total).toLocaleString('es-MX') : '—'}</td>
             <td>
                 ${o.pagado == '1'
-                    ? '<span class="badge badge-entregado">✓ Pagado</span>'
-                    : '<span class="badge badge-cancelado">Pendiente</span>'}
+                    ? `<button class="btn btn-success btn-sm" onclick="togglePago(${o.id_orden},0)">✓ Pagado</button>`
+                    : `<button class="btn btn-danger btn-sm" onclick="togglePago(${o.id_orden},1)">⏳ Pendiente</button>`}
             </td>
             <td>
                 <div style="display:flex;gap:4px;flex-wrap:wrap">
@@ -228,6 +228,12 @@ async function cambiarEstatus(id, estatus, sel) {
     const r = await api({accion:'cambiar_estatus_orden', id_orden:id, estatus}, 'POST');
     if (r.ok) { toast('Estatus actualizado'); cargarOrdenes(filtroOrden); }
     else { sel.value = ''; toast('Error al actualizar', true); }
+}
+
+async function togglePago(id, pagado) {
+    const r = await api({accion:'cambiar_pago_orden', id_orden:id, pagado}, 'POST');
+    if (r.ok) { toast(r.mensaje); cargarOrdenes(filtroOrden); }
+    else toast(r.mensaje || 'Error al actualizar', true);
 }
 
 // Helpers select

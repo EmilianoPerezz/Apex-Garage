@@ -50,7 +50,7 @@ include("layout.php");
     </div>
     <div class="modal-body">
         <form id="form-inventario" class="form-grid">
-            <input type="hidden" name="id_refaccion" id="fi-id">
+            <input type="hidden" name="id_refaccion" id="fi-id_refaccion">
             <div class="form-group form-full">
                 <label class="form-label">Nombre *</label>
                 <input class="form-control" name="nombre" id="fi-nombre" required>
@@ -196,7 +196,7 @@ function filtrarStock(tipo, btn) {
 function abrirModalInventario() {
     document.getElementById('modal-inv-titulo').textContent = 'Nueva Refacción';
     document.getElementById('form-inventario').reset();
-    document.getElementById('fi-id').value = '';
+    document.getElementById('fi-id_refaccion').value = '';
     document.getElementById('fi-cantidad').value = '0';
     document.getElementById('fi-precio_compra').value = '0';
     document.getElementById('fi-precio_venta').value = '0';

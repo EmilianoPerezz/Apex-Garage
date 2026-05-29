@@ -25,6 +25,7 @@ switch ($accion) {
         $s['ordenes_activas']= $conexion->query("SELECT COUNT(*) c FROM ORDEN_SERVICIO WHERE estatus IN('RECIBIDO','EN_PROCESO')")->fetch_assoc()['c'];
         $s['stock_bajo']     = $conexion->query("SELECT COUNT(*) c FROM INVENTARIO WHERE cantidad<=stock_minimo")->fetch_assoc()['c'];
         $s['ingresos_mes']   = $conexion->query("SELECT COALESCE(SUM(total),0) t FROM ORDEN_SERVICIO WHERE estatus='ENTREGADO' AND MONTH(fecha_entrada)=MONTH(NOW()) AND pagado=1")->fetch_assoc()['t'];
+        $s['mecanicos']      = $conexion->query("SELECT COUNT(*) c FROM MECANICO WHERE activo=1")->fetch_assoc()['c'];
         responder(true, $s);
 
     // ── CLIENTES ──────────────────────────────────────────────
@@ -219,6 +220,13 @@ switch ($accion) {
         $conexion->query("UPDATE ORDEN_SERVICIO SET estatus='$estat'$extra WHERE id_orden=$id");
         responder(true, [], 'Estatus actualizado');
 
+    case 'cambiar_pago_orden':
+        $id   = (int)($_POST['id_orden'] ?? 0);
+        $pago = (int)($_POST['pagado']   ?? 0);
+        if (!$id) responder(false, [], 'ID inválido');
+        $conexion->query("UPDATE ORDEN_SERVICIO SET pagado=$pago WHERE id_orden=$id");
+        responder(true, [], $pago ? 'Marcado como pagado' : 'Marcado como pendiente');
+
     // ── MECÁNICOS ─────────────────────────────────────────────
     case 'listar_mecanicos':
         $r = $conexion->query("SELECT * FROM MECANICO WHERE activo=1 ORDER BY nombre");
@@ -257,10 +265,11 @@ switch ($accion) {
     case 'eliminar_inventario':
         $id = (int)($_POST['id_refaccion'] ?? 0);
         if (!$id) responder(false, [], 'ID inválido');
-        // Verificar si está en uso en alguna orden
-        $uso = $conexion->query("SELECT COUNT(*) c FROM DETALLE_ORDEN WHERE tipo='REFACCION' AND id_referencia=$id")->fetch_assoc()['c'];
+        $res = $conexion->query("SELECT COUNT(*) c FROM DETALLE_ORDEN WHERE tipo='REFACCION' AND id_referencia=$id");
+        $uso = $res ? $res->fetch_assoc()['c'] : 0;
         if ($uso > 0) responder(false, [], "No se puede eliminar: está registrada en $uso orden(es)");
-        $conexion->query("DELETE FROM INVENTARIO WHERE id_refaccion=$id");
+        $ok = $conexion->query("DELETE FROM INVENTARIO WHERE id_refaccion=$id");
+        if (!$ok) responder(false, [], 'Error al eliminar: ' . $conexion->error);
         responder(true, [], 'Refacción eliminada');
 
     // ── CATÁLOGO DE SERVICIOS ─────────────────────────────────
@@ -305,10 +314,20 @@ switch ($accion) {
                 WHERE id_mecanico=$id");
             responder(true, [], 'Mecánico actualizado');
         } else {
-            $conexion->query("INSERT INTO MECANICO (nombre,apellido_pat,apellido_mat,telefono,especialidad,salario)
+            $ok = $conexion->query("INSERT INTO MECANICO (nombre,apellido_pat,apellido_mat,telefono,especialidad,salario)
                 VALUES ('$nombre','$ap_pat','$ap_mat','$tel','$espec',$salario)");
+            if (!$ok) responder(false, [], 'Error al guardar: ' . $conexion->error);
             responder(true, ['id_mecanico'=>$conexion->insert_id], 'Mecánico guardado');
         }
+        break;
+
+    case 'eliminar_mecanico':
+        $id = (int)($_POST['id_mecanico'] ?? 0);
+        if (!$id) responder(false, [], 'ID inválido');
+        $activas = $conexion->query("SELECT COUNT(*) c FROM ORDEN_SERVICIO WHERE id_mecanico=$id AND estatus IN('RECIBIDO','EN_PROCESO')")->fetch_assoc()['c'];
+        if ($activas > 0) responder(false, [], "No se puede eliminar: tiene $activas orden(es) activa(s)");
+        $conexion->query("UPDATE MECANICO SET activo=0 WHERE id_mecanico=$id");
+        responder(true, [], 'Mecánico eliminado');
         break;
 
     default:

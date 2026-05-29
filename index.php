@@ -56,6 +56,7 @@ async function cargarDashboard() {
         <div class="stat-card"><span class="stat-icon">🚗</span><div class="stat-value">${s.vehiculos}</div><div class="stat-label">Vehículos</div></div>
         <div class="stat-card"><span class="stat-icon">📅</span><div class="stat-value">${s.citas_hoy}</div><div class="stat-label">Citas hoy</div></div>
         <div class="stat-card"><span class="stat-icon">🔧</span><div class="stat-value">${s.ordenes_activas}</div><div class="stat-label">Órdenes activas</div></div>
+        <div class="stat-card"><span class="stat-icon">🔩</span><div class="stat-value">${s.mecanicos}</div><div class="stat-label">Mecánicos activos</div></div>
         <div class="stat-card"><span class="stat-icon">📦</span><div class="stat-value" style="${s.stock_bajo>0?'color:var(--danger)':''}">${s.stock_bajo}</div><div class="stat-label">Stock bajo</div></div>
         <div class="stat-card"><span class="stat-icon">💰</span><div class="stat-value" style="font-size:22px">$${Number(s.ingresos_mes).toLocaleString('es-MX')}</div><div class="stat-label">Ingresos del mes</div></div>
     `;
